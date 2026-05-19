@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Flask, render_template, g
+from flask import Flask, render_template, g, request
 
 app = Flask(__name__)
 
@@ -79,6 +79,7 @@ def index():
     partners = get_all_partners()
     return render_template("index.html", partner=partner, partners=partners)
 
+#cau 2
 
 @app.route("/partners", methods=["GET"])
 def get_Partner():
@@ -93,6 +94,30 @@ def delete_Partner(partner_id):
     db.commit()
     return {"deleted": partner_id}
 
+#cau 3
+
+@app.route("/partners", methods=["POST"])
+def add_Partner():
+    data = request.json
+    db = get_db()
+    cursor = db.execute(
+        "INSERT INTO Partner (PartnerName, AccountName, EmailAddress, Password, Tel, FromDate) VALUES (?, ?, ?, ?, ?, ?)",
+        (data["PartnerName"], data["AccountName"], data["EmailAddress"], data["Password"], data["Tel"], data["FromDate"])
+    )
+    db.commit()
+    return {"PartnerID": cursor.lastrowid}
+
+
+@app.route("/partners/<int:partner_id>", methods=["PUT"])
+def update_Partner(partner_id):
+    data = request.json
+    db = get_db()
+    db.execute(
+        "UPDATE Partner SET PartnerName=?, AccountName=?, EmailAddress=?, Password=?, Tel=?, FromDate=? WHERE PartnerID=?",
+        (data["PartnerName"], data["AccountName"], data["EmailAddress"], data["Password"], data["Tel"], data["FromDate"], partner_id)
+    )
+    db.commit()
+    return {"updated": partner_id}
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
