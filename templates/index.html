@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Partner Management</title>
+</head>
+<body>
+  <header>
+    <h1>Partner DB</h1>
+    <span>MyDataBase.db · Partner Table</span>
+  </header>
+
+  <section>
+    <p>Thông tin sinh viên</p>
+    {% if partner %}
+      <h2>{{ partner['PartnerName'] }}</h2>
+      <ul>
+        <li><strong>Partner ID:</strong> {{ partner['PartnerID'] }}</li>
+        <li><strong>Account Name:</strong> {{ partner['AccountName'] }}</li>
+        <li><strong>Email:</strong> {{ partner['EmailAddress'] }}</li>
+        <li><strong>Điện thoại:</strong> {{ partner['Tel'] }}</li>
+        <li><strong>Từ ngày:</strong> {{ partner['FromDate'] }}</li>
+      </ul>
+    {% else %}
+      <p>⚠ Không tìm thấy bản ghi "27_HoangCongThanh_01".</p>
+    {% endif %}
+  </section>
+
+  <hr />
+
+  <h3>Tất cả Partners</h3>
+  <table border="1" cellpadding="6" cellspacing="0">
+    <thead>
+      <tr>
+        <th>ID</th><th>Partner Name</th><th>Account</th>
+        <th>Email</th><th>Tel</th><th>From Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in partners %}
+      <tr>
+        <td>{{ p['PartnerID'] }}</td>
+        <td>{{ p['PartnerName'] }}</td>
+        <td>{{ p['AccountName'] }}</td>
+        <td>{{ p['EmailAddress'] }}</td>
+        <td>{{ p['Tel'] }}</td>
+        <td>{{ p['FromDate'] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
