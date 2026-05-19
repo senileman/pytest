@@ -3,7 +3,6 @@ from flask import Flask, render_template, g
 
 app = Flask(__name__)
 
-
 DATABASE = "MyDataBase.db"
 
 
@@ -26,11 +25,11 @@ def seed_data():
     count = cursor.execute("SELECT COUNT(*) FROM Partner").fetchone()[0]
     if count == 0:
         sample_data = [
-            ("abc",         "abc_corp",      "contact@abc.vn",      "abc@2024",   "0901234567", "2024-01-15"),
-            ("XYZ",             "xyz_group",     "info@xyz.com.vn",     "xyz#pass1",  "0912345678", "2024-03-20"),
-            ("phuquy",     "phuquy_dn",     "phuquy@email.vn",     "pq!secure2", "0923456789", "2024-05-10"),
-            ("minhtan", "minhtan_cp",    "minhtan@business.vn", "mt@2024!",   "0934567890", "2024-07-01"),
-            ("27_HoangCongThanh_01",     "hoancongthanh", "thanh27@student.vn",  "hct@2024",   "0945678901", "2024-09-05"),
+            ("abc",                  "abc_corp",      "contact@abc.vn",      "abc@2024",   "0901234567", "2024-01-15"),
+            ("XYZ",                  "xyz_group",     "info@xyz.com.vn",     "xyz#pass1",  "0912345678", "2024-03-20"),
+            ("phuquy",               "phuquy_dn",     "phuquy@email.vn",     "pq!secure2", "0923456789", "2024-05-10"),
+            ("minhtan",              "minhtan_cp",    "minhtan@business.vn", "mt@2024!",   "0934567890", "2024-07-01"),
+            ("27_HoangCongThanh_01", "hoancongthanh", "thanh27@student.vn",  "hct@2024",   "0945678901", "2024-09-05"),
         ]
         cursor.executemany("""
             INSERT INTO Partner (PartnerName, AccountName, EmailAddress, Password, Tel, FromDate)
@@ -47,9 +46,7 @@ def seed_data():
 seed_data()
 
 
-
 def get_db():
-
     if "db" not in g:
         g.db = sqlite3.connect(DATABASE)
         g.db.row_factory = sqlite3.Row
@@ -58,15 +55,12 @@ def get_db():
 
 @app.teardown_appcontext
 def close_db(error=None):
-
     db = g.pop("db", None)
     if db is not None:
         db.close()
 
 
-
 def get_partner_27_HoangCongThanh_01():
-
     db = get_db()
     return db.execute(
         "SELECT * FROM Partner WHERE PartnerName = ?",
@@ -75,10 +69,8 @@ def get_partner_27_HoangCongThanh_01():
 
 
 def get_all_partners():
-
     db = get_db()
     return db.execute("SELECT * FROM Partner ORDER BY PartnerID").fetchall()
-
 
 
 @app.route("/")
@@ -86,6 +78,20 @@ def index():
     partner  = get_partner_27_HoangCongThanh_01()
     partners = get_all_partners()
     return render_template("index.html", partner=partner, partners=partners)
+
+
+@app.route("/partners", methods=["GET"])
+def get_Partner():
+    rows = get_db().execute("SELECT * FROM Partner ORDER BY PartnerID").fetchall()
+    return {"partners": [dict(r) for r in rows]}
+
+
+@app.route("/partners/<int:partner_id>", methods=["DELETE"])
+def delete_Partner(partner_id):
+    db = get_db()
+    db.execute("DELETE FROM Partner WHERE PartnerID = ?", (partner_id,))
+    db.commit()
+    return {"deleted": partner_id}
 
 
 if __name__ == "__main__":
